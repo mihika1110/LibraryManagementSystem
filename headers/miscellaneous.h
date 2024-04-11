@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#include <stdlib.h>
+#else
+#include <unistd.h>
+#include <stdio.h>
+#endif
+
+void displayASCII(char [50]);
+void pause(int);
+void clear();
+
+void displayASCII(char fileName[50])
+{
+    FILE *file = fopen(fileName, "r");
+
+    int ch;
+    while ((ch = fgetc(file)) != EOF) {
+        putchar(ch);
+    }
+
+    fclose(file);
+
+    printf("\n\n\n");
+}
+
+void pause(int seconds)
+{
+    #ifdef _WIN32
+        Sleep(seconds*1000); // Windows: Sleep for 3000 milliseconds (3 seconds)
+    #else
+        sleep(seconds);    // Unix-like systems: Sleep for 3 seconds
+    #endif
+}
+
+void clear()
+{
+    #ifdef _WIN32
+        system("cls"); // Windows
+    #else
+        printf("\033[2J\033[1;1H"); // Unix-like systems (ANSI escape codes)
+    #endif
+}
+
+char *formatDate(int n)
+{
+    char *date = malloc(11 * sizeof(char));
+    sprintf(date, "%d/%d/%d", (n%100),((n%1000)/100),(n/10000));
+
+    return date;
+}
