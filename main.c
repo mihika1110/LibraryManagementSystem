@@ -1,19 +1,75 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#include <stdlib.h>
+#else
+#include <unistd.h>
+#include <stdio.h>
+#endif
 
 struct Credentials
 {
     char email[50];
     char password[50];
 };
+
+
 int login=0;
+
+void homePage();
+void welcomePage();
+void displayASCII(char [50]);
+void pause(int);
+void clear();
+void registerCredentials(struct Credentials);
+struct Credentials fetchCredentials(char [50]);
+void registerUser();
+void loginUser();
+void homePage();
+void welcomePage();
+
+
+void displayASCII(char fileName[50])
+{
+    FILE *file = fopen(fileName, "r");
+
+    int ch;
+    while ((ch = fgetc(file)) != EOF) {
+        putchar(ch);
+    }
+
+    fclose(file);
+
+    printf("\n\n\n");
+}
+
+void pause(int seconds)
+{
+    #ifdef _WIN32
+        Sleep(seconds*1000); // Windows: Sleep for 3000 milliseconds (3 seconds)
+    #else
+        sleep(seconds);    // Unix-like systems: Sleep for 3 seconds
+    #endif
+}
+
+void clear()
+{
+    #ifdef _WIN32
+        system("cls"); // Windows
+    #else
+        printf("\033[2J\033[1;1H"); // Unix-like systems (ANSI escape codes)
+    #endif
+}
 
 void registerCredentials(struct Credentials credential)
 {
     FILE *file;
 
     char fileName[50];
-    sprintf(fileName, "credentials/%s.txt", credential.email);
+    sprintf(fileName, "credentials/%s.bin", credential.email);
 
     file = fopen(fileName, "w");
     fwrite(&credential, sizeof(struct Credentials), 1, file);
@@ -27,7 +83,7 @@ struct Credentials fetchCredentials(char email[50])
     FILE *file;
 
     char fileName[50];
-    sprintf(fileName, "credentials/%s.txt", email);
+    sprintf(fileName, "credentials/%s.bin", email);
 
     file = fopen(fileName, "r");
 
@@ -51,7 +107,6 @@ void registerUser()
     scanf("%s",roll);
 
     char email[50];
-    // sprintf(email, "%s_%s@iitp.ac.in", tolower(name),tolower(roll));
     sprintf(email, "%s_%s@iitp.ac.in", name,roll);
 
     struct Credentials credential=fetchCredentials(email);
@@ -95,29 +150,60 @@ void loginUser()
     {
         login=1;
     }
+    else
+    {        
+        login=0;
+    }
 }
 
 void welcomePage()
 {
     int choice;
-    printf("Enter the options: \n1. Register\n2. Login\n");
+
+    displayASCII("ascii-arts/header.txt");
+
+    displayASCII("ascii-arts/welcome.txt");
     scanf("%d",&choice);
 
     if(choice==1)
     {
         registerUser();
+        
+        printf("\n\nRegistered Successfully!\nRedirecting to welcomepage\n");
+
+        pause(2);//pauses the code execution for 2seconds
+        system("cls");//clears the console
+
         welcomePage();
     }
     else if(choice==2)
     {
         loginUser();
-        homePage();
+        if(login)
+        {
+            printf("\n\nLogined Successfully\nRedirecting to Homepage\n");
+
+            pause(2);
+            system("cls");
+
+            homePage();
+        }
+        else
+        {
+            printf("\n\nIncorrect password!\nRedirecting to Welcomepage\n");
+            
+            pause(2);
+            system("cls");
+
+            welcomePage();
+        }
     }
 }
 
 void homePage()
 {
-
+    printf("Login: %d",login);
+    scanf("");
 }
 
 int main()
