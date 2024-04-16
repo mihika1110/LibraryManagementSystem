@@ -19,7 +19,8 @@ void displayASCII(char fileName[50])
     FILE *file = fopen(fileName, "r");
 
     int ch;
-    while ((ch = fgetc(file)) != EOF) {
+    while ((ch = fgetc(file)) != EOF)
+    {
         putchar(ch);
     }
 

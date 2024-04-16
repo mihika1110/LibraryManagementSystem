@@ -2,7 +2,7 @@
 struct Credentials
 {
     char email[50];
-    char password[50];
+    int password[8];
 };
 
 struct Book

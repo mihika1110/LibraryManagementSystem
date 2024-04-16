@@ -1,15 +1,20 @@
 #include "./data-types.h"
+// #include "./encryption.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 int login=0;
+int ADMIN=0;
+char Email[50];
 
 void registerCredentials(struct Credentials);
 struct Credentials fetchCredentials(char [50]);
 void registerUser();
 struct Student loginUser();
+
+
 
 void registerCredentials(struct Credentials credential)
 {
@@ -28,6 +33,7 @@ struct Credentials fetchCredentials(char email[50])
 {
     struct Credentials credential;
     FILE *file;
+    char t;
 
     char fileName[50];
     sprintf(fileName, "credentials/%s.bin", email);
@@ -36,9 +42,11 @@ struct Credentials fetchCredentials(char email[50])
 
     if(file==NULL)
     {
-        struct Credentials temp={"null","null"};
+        struct Credentials temp;
+        strcpy(temp.email,"null");
         return temp;
     }
+
 
     fread(&credential, sizeof(struct Credentials), 1, file);
     fclose(file);
@@ -97,10 +105,17 @@ void registerUser()
         student.nBooks=0;
         storeData(student,email);
 
+        int encrypted_password[8];
+        EncryptPasssword(pass,encrypted_password);
+        
         strcpy(credential.email, email);
-        strcpy(credential.password, pass);
-
+        for(int i=0;i<8;i++){
+            credential.password[i]=encrypted_password[i];
+        }
+        
         registerCredentials(credential);
+
+        printf("Registered Successfully!\n");        
     }
     else
     {
@@ -108,10 +123,24 @@ void registerUser()
     }
 }
 
+int compare_password(int input_password[],int actual_password[])
+{
+    int equal = 1;
+    for(int i=0;i<8;i++){
+        if(input_password[i]!=actual_password[i]){
+            equal=0;
+            break;
+        }
+    }
+
+    return equal;
+}
+
 struct Student loginUser()
 {
     struct Student student;
     char email[50],pass[50];
+    int Encrypted_password[8];
     printf("Enter your email: ");
     scanf("%s",email);
 
@@ -126,10 +155,16 @@ struct Student loginUser()
     printf("Enter password: ");
     scanf("%s",pass);
 
-    if(strcmp(credential.password,pass)==0)
+    EncryptPasssword(pass,Encrypted_password);
+
+    if(compare_password(Encrypted_password,credential.password)==1)
     {
+        if(strcmp(credential.email,"admin_admin@iitp.ac.in")==0)
+        {
+            ADMIN = 1;
+        }
         login=1;
-        
+        sprintf(Email,credential.email);
         student=fetchData(credential.email);
     }
     else

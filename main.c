@@ -1,33 +1,54 @@
-#include "./headers/authentication.h"
-#include "./headers/miscellaneous.h"
-#include "./headers/librarySystem.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "./headers/encryption.h"
+#include "./headers/authentication.h"
+#include "./headers/miscellaneous.h"
+#include "./headers/librarySystem.h"
+#include "./headers/admin.h"
+
 
 struct Student student;
 
 void welcomePage();
 void homePage();
 
+void return_back()//this makes the execution wait until the user enters "1"
+{
+    char temp[50];
+
+    printf("\nPress 1 to go back : ");
+    while(strcmp(temp,"1")!=0)
+    {
+        scanf("%s",temp);
+    }
+    
+    printf("\n\nGoing Back:)\n");
+
+    pause(2);
+    clear();
+
+    homePage();
+}
+
 void welcomePage()
 {
     int choice;
 
-    displayASCII("ascii-arts/header.txt");
+    displayASCII("ascii-arts/header.txt");//displays "IIT Patna Library"
+    displayASCII("ascii-arts/welcome.txt");//displays welcome screen
 
-    displayASCII("ascii-arts/welcome.txt");
     scanf("%d",&choice);
 
     if(choice==1)
     {
-        registerUser();
+        registerUser();//redirects user to the register page
         
-        printf("\n\nRegistered Successfully!\nRedirecting to welcomepage\n");
+        printf("\n\nRedirecting to welcomepage\n");
 
         pause(2);//pauses the code execution for 2seconds
-        system("cls");//clears the console
+        clear();//clears the console
 
         welcomePage();
     }
@@ -39,16 +60,16 @@ void welcomePage()
             printf("\n\nLogined Successfully\nRedirecting to Homepage\n");
 
             pause(2);
-            system("cls");
+            clear();
 
             homePage();
         }
         else
         {
-            printf("\n\nIncorrect password!\nRedirecting to Welcomepage\n");
+            printf("\n\nIncorrect credentials!\nRedirecting to Welcomepage\n");
             
             pause(2);
-            system("cls");
+            clear();
 
             welcomePage();
         }
@@ -57,65 +78,152 @@ void welcomePage()
 
 void homePage()
 {
-    int choice;
-    displayASCII("./ascii-arts/header.txt");
-    displayASCII("./ascii-arts/home.txt");
-    scanf("%d",&choice);
 
-    if(choice==1)
+    if(ADMIN==0)
     {
-        if(student.nBooks<6)
+        int choice;
+
+        displayASCII("./ascii-arts/header.txt");//displays "IIT Patna Library"
+        displayASCII("./ascii-arts/home.txt");//displays homepage features-user
+
+        scanf("%d",&choice);
+
+        if(choice==1)
         {
-            printf("The lists of book that you can issue are:-\n");
+            if(student.nBooks<6)
+            {
+                printf("The lists of book that you can issue are:-\n");
+
+                printBooks();
+
+                int issuebook=0;
+                printf("Enter the book you want to be issued : ");
+
+                scanf("%d",&issuebook);
+                addToIssuedBook(issuebook);
+                
+                printf("\n\nBook issued succesfull\n");
+            }
+            else
+            {
+                printf("You can't issue more than 5 books at a time.\nReturn a book before issuing another\n\n");
+            }        
+
+            printf("Redirecting to Homepage\n");
+
+            pause(2);
+            clear();
+
+            homePage();
+        }
+        else if(choice==2)
+        {
+            printIssuedBooks(Email);//prints all issued books of the corresponding email id  
+            
+            return_back();//awaits till user's response with "1"
+        }
+        else if(choice==3)
+        {
+            printIssuedBooks(Email);
+
+            return_book();//calls method to return the book
+
+            return_back();
+        }
+        else if(choice==4)
+        {
+            printMessage(Email);//prints the messages that the user received from the admin
+
+            return_back();
         }
         else
         {
-            printf("You can't issue more than 5 books at a time.\nReturn a book before issuing another\n");
-        }
-    }
-    else if(choice==2)
-    {
-        for(int i=0;i<=student.nBooks;i++)
-        {
-            printf("Book:-%s Author:-%s Issued Date:-%s Due Date:-%s",student.bookIssued[i].name,student.bookIssued[i].author,formatDate(student.bookIssued[i].issueDate),formatDate(student.bookIssued[i].dueDate));
-        }
-    }
-    else if(choice==3)
-    {
-        printf("Enter the book number to return:-\n");
-        for(int i=0;i<=student.nBooks;i++)
-        {
-            printf("%d. Book:-%s Author:-%s Issued Date:-%s Due Date:-%s",i+1,student.bookIssued[i].name,student.bookIssued[i].author,formatDate(student.bookIssued[i].issueDate),formatDate(student.bookIssued[i].dueDate));
-        }
-    }
-    else if(choice==4)
-    {
-        for(int i=0;i<=student.nMessages;i++)
-        {
-            printf("Message%d",i+1);
-            printf("%s",student.messages[i]);
-            strcpy(student.messages[i],NULL);
-        }
-    }
-    else
-    {
-        printf("Invalid Choice!\n");
+            printf("Invalid Choice!\n");
 
-        pause(2);
-        clear();
+            return_back();
+        }
+    }
 
-        homePage();
+
+    if(ADMIN==1)
+    {
+        int choice;
+        
+        displayASCII("./ascii-arts/header.txt");//displays "IIT Patna Library"
+        displayASCII("./ascii-arts/admin-features.txt");//displays homepage features
+
+        scanf("%d",&choice);
+
+        if(choice==1)
+        {
+            addBook();//calls method to add book to the library stock
+            
+            return_back();
+        }
+        else if(choice==2)
+        {            
+            sendMail();//sends mails to the library customers
+
+            return_back();      
+        }
+        else if(choice==3)
+        {
+            printBooks();//prints all the lists of books available
+
+            int book_number;
+            printf("Book number you want to delete: ");
+            scanf("%d",&book_number);
+
+            remove_book(book_number);//removes the book from the library stock of the given book number
+
+            return_back();
+        }
+        else if(choice==4)
+        {
+            print_users();//lists all the registered users
+
+            return_back();
+        }
+        else if(choice==5)
+        {
+            printBooks();
+
+            int book_number;
+            printf("Book number you want to modify: ");
+            scanf("%d",&book_number);
+            Modify_book(book_number);
+
+            return_back();
+        }
+        else if(choice==6)
+        {
+            print_users();
+            int user_number;
+
+            printf("User number you want to delete: ");
+            scanf("%d",&user_number);
+
+            delete_user(user_number);//delete the user accossiated with the user number 
+
+            return_back();
+        }
+        else if(choice==7)
+        {
+            initializeBooks();//initalizes the book stock to the default book stocks
+
+            return_back();
+        }
+        else
+        {
+            printf("\n\nInvalid choice!\n");
+
+            return_back();
+        }
     }
 }
 
+
 int main()
 {
-    // welcomePage();
-
-    // initializeBooks();
-
-    struct Book bookIssued[10];
-    readLibraryFromFile(bookIssued,sizeof(bookIssued) / sizeof(bookIssued[0]));
-
-    printBooks(bookIssued,sizeof(bookIssued) / sizeof(bookIssued[0]));
+    welcomePage();
 }
