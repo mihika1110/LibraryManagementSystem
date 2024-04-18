@@ -3,13 +3,10 @@
 #include <string.h>
 
 #include "./headers/encryption.h"
-#include "./headers/authentication.h"
-#include "./headers/miscellaneous.h"
+// #include "./headers/authentication.h"
 #include "./headers/librarySystem.h"
 #include "./headers/admin.h"
 
-
-struct Student student;
 
 void welcomePage();
 void homePage();
@@ -63,6 +60,11 @@ void welcomePage()
             clear();
 
             homePage();
+
+            char fileName[50];
+            sprintf(fileName, "students-data/%s.bin",Email);
+            student=fetchData(fileName);
+            admin=fetchData("students-data/admin_admin@iitp.ac.in.bin");
         }
         else
         {
@@ -90,19 +92,19 @@ void homePage()
 
         if(choice==1)
         {
-            if(student.nBooks<6)
+            if(student.nBooks<5)
             {
                 printf("The lists of book that you can issue are:-\n");
 
-                printBooks();
+                printBooks();                
 
-                int issuebook=0;
-                printf("Enter the book you want to be issued : ");
+                int issueBook=0;
+                printf("Enter the book number you want to issue: ");
+                scanf("%d",&issueBook);
 
-                scanf("%d",&issuebook);
-                addToIssuedBook(issuebook);
+                addToIssuedBook(issueBook);
                 
-                printf("\n\nBook issued succesfull\n");
+                printf("\n\nBook issued succesfully\n");
             }
             else
             {
@@ -118,8 +120,10 @@ void homePage()
         }
         else if(choice==2)
         {
-            printIssuedBooks(Email);//prints all issued books of the corresponding email id  
+            printIssuedBooks(Email);//prints all issued books of the corresponding email id
             
+            printf("%d\n",student.nBooks);//---->debug
+
             return_back();//awaits till user's response with "1"
         }
         else if(choice==3)
@@ -132,16 +136,28 @@ void homePage()
         }
         else if(choice==4)
         {
-            printMessage(Email);//prints the messages that the user received from the admin
+            int previewBook=0;
+            printf("Enter the book you want to preview: ");
+            scanf("%d",&previewBook);
+            
+            printBooksPreview(previewBook);//prints the book preview
 
             return_back();
         }
         else if(choice==5)
         {
+            ADMIN=0;
+            login=0;
+
             displayASCII("./ascii-arts/logout.txt");
 
             pause(2);
             clear();
+
+            char fileName[50];
+            sprintf(fileName, "students-data/%s.bin",Email);
+            storeData(student,fileName);
+            storeData(admin,"students-data/admin_admin@iitp.ac.in.bin");
 
             welcomePage();
         }
@@ -169,13 +185,13 @@ void homePage()
             
             return_back();
         }
-        else if(choice==2)
-        {            
-            sendMail();//sends mails to the library customers
+        // else if(choice==2)
+        // {            
+        //     sendMail();//sends mails to the library customers
 
-            return_back();      
-        }
-        else if(choice==3)
+        //     return_back();      
+        // }
+        else if(choice==2)
         {
             printBooks();//prints all the lists of books available
 
@@ -187,13 +203,13 @@ void homePage()
 
             return_back();
         }
-        else if(choice==4)
+        else if(choice==3)
         {
             print_users();//lists all the registered users
 
             return_back();
         }
-        else if(choice==5)
+        else if(choice==4)
         {
             printBooks();
 
@@ -204,7 +220,7 @@ void homePage()
 
             return_back();
         }
-        else if(choice==6)
+        else if(choice==5)
         {
             print_users();
             int user_number;
@@ -216,20 +232,23 @@ void homePage()
 
             return_back();
         }
-        else if(choice==7)
+        else if(choice==6)
         {
             initializeBooks();//initalizes the book stock to the default book stocks
 
             return_back();
         }
-        else if(choice==8)
+        else if(choice==7)
         {
             ADMIN=0;
+            login=0;
 
             displayASCII("./ascii-arts/logout.txt");
 
             pause(2);
             clear();
+
+            storeData(admin,"students-data/admin_admin@iitp.ac.in.bin");
 
             welcomePage();
         }

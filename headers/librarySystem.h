@@ -1,22 +1,9 @@
-// #include "./data-types.h"
-// #include "./miscellaneous.h"
+#include "./authentication.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
-
-// void readLibraryFromFile(struct Book libraryBook[], int size) 
-// {
-//     FILE *file = fopen("./library-data/libraryBook.bin", "rb");
-//     if (file == NULL)
-//     {
-//         printf("Error opening file for reading.\n");
-//         return;
-//     }
-//     fread(libraryBook, sizeof(struct Book), size, file);
-//     fclose(file);
-// }
 
 void writeLibraryBookToFile(struct Book libraryBook[], int size)
 {
@@ -137,10 +124,63 @@ void initializeBooks()
         "Ralph Ellison"
     };
 
+    char *preview[]={
+        "A poignant tale of racial injustice and moral growth in the American South.",
+        "An ominous portrayal of a dystopian society ruled by totalitarianism and surveillance.",
+        "A vivid depiction of the Jazz Age's excesses and disillusionment with the American Dream.",
+        "A multigenerational narrative blending magical realism and family saga in a Latin American village.",
+        "An epic adventure of obsession, revenge, and the awe-inspiring power of nature.",
+        "A sweeping panorama of Russian society during the Napoleonic Wars, exploring love, war, and fate.",
+        "A coming-of-age novel capturing the angst and alienation of adolescence in post-war America.",
+        "A controversial exploration of obsession, desire, and the corruption of innocence.",
+        "A rich tapestry of provincial life and human struggles, focusing on marriage, ambition, and societal expectations.",
+        "An epic fantasy journey through a world of myth, magic, and heroism.",
+        "A sparkling comedy of manners exploring love, marriage, and social class in Georgian England.",
+        "A psychological exploration of guilt, punishment, and redemption in 19th-century Russia.",
+        "A Gothic masterpiece of passion, revenge, and the destructive power of love on the Yorkshire moors.",
+        "A profound examination of faith, morality, and the nature of evil in 19th-century Russia.",
+        "An epic poem chronicling the trials and tribulations of Odysseus as he journeys home from the Trojan War.",
+        "A tragic tale of love, betrayal, and societal constraints in imperial Russia.",
+        "A classic bildungsroman portraying the struggles of a young orphan striving for social acceptance.",
+        "A powerful depiction of the Great Depression's impact on a displaced Oklahoma family.",
+        "A satirical masterpiece exposing the absurdity and brutality of war and bureaucracy.",
+        "A haunting exploration of slavery, trauma, and the enduring legacy of America's past.",
+        "A monumental exploration of memory, time, and identity in a world transformed by technology.",
+        "A dystopian vision of a future society dominated by consumerism, conformity, and surveillance.",
+        "A sweeping saga of love and loss amidst the turbulence of the American Civil War.",
+        "A modernist masterpiece of stream-of-consciousness narrative, exploring time, memory, and identity.",
+        "A dark and atmospheric tale of vanity, decadence, and the price of artistic ambition.",
+        "An experimental novel that pushes the boundaries of narrative form and language.",
+        "A timeless romance exploring themes of class, morality, and social convention.",
+        "A rollicking adventure following the exploits of a chivalrous knight and his loyal squire.",
+        "A satirical coming-of-age story set against the backdrop of pre-Civil War America.",
+        "A thrilling tale of adventure, revenge, and redemption set in early 19th-century France.",
+        "A witty comedy of manners exploring the complexities of matchmaking and romance.",
+        "A poignant exploration of the Lost Generation's disillusionment and search for meaning.",
+        "A haunting tale of sin, guilt, and redemption in Puritan New England.",
+        "A sweeping historical novel set against the backdrop of the French Revolution.",
+        "An epic poem recounting the trials and tribulations of the Trojan War heroes.",
+        "A medieval allegory detailing the author's journey through Hell, Purgatory, and Paradise.",
+        "A sprawling epic of love, sacrifice, and redemption set in 19th-century France.",
+        "A seminal work of Gothic literature exploring themes of science, ambition, and morality.",
+        "A whimsical journey through a world of imagination and wordplay.",
+        "A collection of stories that offer a vivid snapshot of medieval English society.",
+        "A swashbuckling adventure following the escapades of a young swordsman and his friends.",
+        "An enchanting tale of adventure, friendship, and heroism in Middle-earth.",
+        "A chilling exploration of free will, morality, and the nature of evil in a dystopian future.",
+        "An existentialist masterpiece exploring the absurdity and alienation of modern life.",
+        "A gripping tale of endurance, resilience, and the struggle against nature's indifference.",
+        "A haunting journey into the heart of darkness both within and without.",
+        "A disturbing allegory of civilization's collapse and the descent into savagery.",
+        "A satirical indictment of war and the dehumanizing effects of bureaucracy and technology.",
+        "A searing exploration of race, identity, and invisibility in America."
+    };
+
     for(int i=0;i<sizeof(libraryBook) / sizeof(libraryBook[0]);i++)
     {
         strcpy(libraryBook[i].name,bookNames[i]);
         strcpy(libraryBook[i].author,authorNames[i]);
+        strcpy(libraryBook[i].preview,preview[i]);
         libraryBook[i].issueDate=20240411;
         libraryBook[i].dueDate=20240511;
     }
@@ -168,6 +208,34 @@ void printBooks()
         printf("Book %d:-%s Author:-%s",i,temp.name,temp.author);
         printf("\n\n");
         
+        i++;
+    }
+    fclose(file);
+}
+
+void printBooksPreview(int bookNumber)
+{
+    FILE *file;
+    file = fopen("./library-data/libraryBook.bin", "rb");
+    struct Book temp;
+    int i=1;
+
+    printf("\n\n\n");
+    displayASCII("./ascii-arts/preview.txt");
+
+    while(1)
+    {
+        fread(&temp,sizeof(temp),1,file);
+        if(feof(file))
+        {
+            break;
+        }
+    
+        if(i==bookNumber)
+        {
+            printf("%s \n%s",temp.name,temp.preview);
+            printf("\n\n");
+        }
         i++;
     }
     fclose(file);
@@ -206,6 +274,8 @@ void addToIssuedBook(int book_number)
 
     fclose(writefile);
     fclose(readfile);
+
+    student.nBooks++;
 }
 
 void printIssuedBooks(char mail[50])
@@ -303,44 +373,46 @@ void return_book()
     }
     fclose(fp);
     fclose(fp1);
+
+    student.nBooks--;
 }
 
 //need to review
-void printMessage(char mail[])
-{
-    FILE *file;
-    char fileName[50] = "";
+// void printMessage(char mail[])
+// {
+//     FILE *file;
+//     char fileName[50] = "";
     
-    sprintf(fileName, "./message/%s.bin", Email);
-    file = fopen(fileName, "rb");
+//     sprintf(fileName, "./message/%s.bin", Email);
+//     file = fopen(fileName, "rb");
 
-    if(file==NULL)
-    {
-        printf("you have no mails to display");
-    }
-    else
-    {            
-        char temp[50];
-        int i=1;
-        printf("\nMAILS\n");
+//     if(file==NULL)
+//     {
+//         printf("you have no mails to display");
+//     }
+//     else
+//     {            
+//         char temp[50];
+//         int i=1;
+//         printf("\nMAILS\n");
 
-        while(1){
-            fread(&temp,sizeof(temp),1,file);
-            if(feof(file))
-            {
-                if(i==1)
-                {
-                    printf("you have no mails to display");
-                }
-                break;
-            }
+//         while(1){
+//             fread(&temp,sizeof(temp),1,file);
+//             if(feof(file))
+//             {
+//                 if(i==1)
+//                 {
+//                     printf("you have no mails to display");
+//                 }
+//                 break;
+//             }
             
-            printf("%d. %s",i,temp);
-            printf("\n");
+//             printf("%d. %s",i,temp);
+//             printf("\n");
             
-            i++;
-        }
+//             i++;
+//         }
 
-        fclose(file);
-    }
-}
+//         fclose(file);
+//     }
+// }

@@ -11,13 +11,10 @@ struct Book
     char author[50];
     int issueDate;
     int dueDate;
+    char preview[500];
 };
 
 struct Student
 {
-    char name[50];
-    struct Book bookIssued[5];
-    char messages[5][50];
-    int nMessages;
     int nBooks;
 };

@@ -13,6 +13,7 @@
 void displayASCII(char [50]);
 void pause(int);
 void clear();
+void toLower(char *);
 
 void displayASCII(char fileName[50])
 {
@@ -47,10 +48,23 @@ void clear()
     #endif
 }
 
-char *formatDate(int n)
-{
-    char *date = malloc(11 * sizeof(char));
-    sprintf(date, "%d/%d/%d", (n%100),((n%1000)/100),(n/10000));
+// char *formatDate(int n)
+// {
+//     char *date = malloc(11 * sizeof(char));
+//     sprintf(date, "%d/%d/%d", (n%100),((n%1000)/100),(n/10000));
 
-    return date;
+//     return date;
+// }
+
+void toLower(char *str)
+{
+    int i = 0;
+    while(str[i] != '\0')
+    {
+        if(str[i] >= 'A' && str[i] <= 'Z')
+        {
+            str[i] = str[i] + 32;
+        }
+        i++;
+    }
 }

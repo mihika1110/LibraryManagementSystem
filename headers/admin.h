@@ -25,25 +25,25 @@ void addBook()
 }
 
 
-void sendMail()
-{
-    char temp_mail[50],subject[50];
-            printf("send message to email : ");
-            scanf("%s",temp_mail);
-            printf("subject of the mail : ");
-            scanf("%s",subject);
+// void sendMail()
+// {
+//     char temp_mail[50],subject[50];
+//     printf("send message to email : ");
+//     scanf("%s",temp_mail);
+//     printf("subject of the mail : ");
+//     scanf("%s",subject);
 
-            FILE *file;
-            char fileName[50] ;
-            sprintf(fileName,"./message/%s.bin",temp_mail);
-            file=fopen(fileName,"ab");
-            fwrite(subject,sizeof(subject),1,file);
+//     FILE *file;
+//     char fileName[50] ;
+//     sprintf(fileName,"./message/%s.bin",temp_mail);
+//     file=fopen(fileName,"ab");
+//     fwrite(subject,sizeof(subject),1,file);
 
-            fclose(file);
+//     fclose(file);
 
-            
-            printf("\n\nEmail sent sucessfully\n");
-}
+    
+//     printf("\n\nEmail sent sucessfully\n");
+// }
 
 
 void remove_book(int book_number){
@@ -54,7 +54,7 @@ void remove_book(int book_number){
 
     char fileName[50] = "";
             
-            sprintf(fileName, "./library-data/libraryBook.bin");
+    sprintf(fileName, "./library-data/libraryBook.bin");
             
 
     fp=fopen(fileName,"rb");
@@ -135,7 +135,6 @@ void print_users()
       }
       closedir(dr); //close all directory
    }
-   
 }
 
 void Modify_book(int book_number){
