@@ -26,7 +26,7 @@ void return_back()//this makes the execution wait until the user enters "1"
     
     printf("\n\nGoing Back:)\n");
 
-    pause(2);
+    pause(1);
     clear();
 
     homePage();
@@ -136,6 +136,15 @@ void homePage()
 
             return_back();
         }
+        else if(choice==5)
+        {
+            displayASCII("./ascii-arts/logout.txt");
+
+            pause(2);
+            clear();
+
+            welcomePage();
+        }
         else
         {
             printf("Invalid Choice!\n");
@@ -212,6 +221,17 @@ void homePage()
             initializeBooks();//initalizes the book stock to the default book stocks
 
             return_back();
+        }
+        else if(choice==8)
+        {
+            ADMIN=0;
+
+            displayASCII("./ascii-arts/logout.txt");
+
+            pause(2);
+            clear();
+
+            welcomePage();
         }
         else
         {
