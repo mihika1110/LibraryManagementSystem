@@ -46,7 +46,7 @@ void addBook()
 // }
 
 
-void remove_book(int book_number){
+void remove_book(){
 
     FILE *fp,*fp1;
     struct Book t,t1;
@@ -60,52 +60,62 @@ void remove_book(int book_number){
     fp=fopen(fileName,"rb");
     fp1=fopen("./book-issue-data/temp.bin","wb");
 
-    while(1)
-    {
-        fread(&t,sizeof(t),1,fp);
+    if(fp!=NULL){
 
-        if(feof(fp))
+        int book_number;
+            printf("Book number you want to delete: ");
+            scanf("%d",&book_number);
+
+
+        while(1)
         {
-            break;
+            fread(&t,sizeof(t),1,fp);
+
+            if(feof(fp))
+            {
+                break;
+            }
+            if(line==book_number)
+            {
+                found=1;
+            }
+            else
+            {
+                fwrite(&t,sizeof(t),1,fp1);
+            }
+
+            line++;
         }
-        if(line==book_number)
+        fclose(fp);
+        fclose(fp1);
+
+        if(found==0)
         {
-            found=1;
+            printf("Sorry No Record Found\n\n");
         }
         else
         {
-            fwrite(&t,sizeof(t),1,fp1);
+            fp=fopen(fileName,"wb");
+            fp1=fopen("./book-issue-data/temp.bin","rb");
+
+        while(1)
+        {
+            fread(&t,sizeof(t),1,fp1);
+
+        if(feof(fp1))
+        {
+            break;
         }
+            fwrite(&t,sizeof(t),1,fp);
+        }
+        }
+        fclose(fp);
+        fclose(fp1);
 
-        line++;
+        printf("\n\nBook has been removed successfully from the library.\n");
+    }else{
+        printf("no book to remove\n");
     }
-    fclose(fp);
-    fclose(fp1);
-
-    if(found==0)
-    {
-        printf("Sorry No Record Found\n\n");
-    }
-    else
-    {
-        fp=fopen(fileName,"wb");
-        fp1=fopen("./book-issue-data/temp.bin","rb");
-
-    while(1)
-    {
-        fread(&t,sizeof(t),1,fp1);
-
-    if(feof(fp1))
-    {
-        break;
-    }
-        fwrite(&t,sizeof(t),1,fp);
-    }
-    }
-    fclose(fp);
-    fclose(fp1);
-
-    printf("\n\nBook has been removed successfully from the library.\n");
 }
 
 
