@@ -197,20 +197,25 @@ void printBooks()
     struct Book temp;
     int i=1;
 
-    while(1)
-    {
-        fread(&temp,sizeof(temp),1,file);
-        if(feof(file))
+    if(file!=NULL){
+        while(1)
         {
-            break;
-        }
-    
-        printf("Book %d:-%s Author:-%s",i,temp.name,temp.author);
-        printf("\n\n");
+            fread(&temp,sizeof(temp),1,file);
+            if(feof(file))
+            {
+                break;
+            }
         
-        i++;
+            printf("Book %d:-%s Author:-%s",i,temp.name,temp.author);
+            printf("\n\n");
+            
+            i++;
+        }
+        fclose(file);
+    }else{
+        printf("library is empty\n");
     }
-    fclose(file);
+
 }
 
 void printBooksPreview(int bookNumber)
@@ -220,28 +225,31 @@ void printBooksPreview(int bookNumber)
     struct Book temp;
     int i=1;
 
-    printf("\n\n\n");
-    displayASCII("./ascii-arts/preview.txt");
+    if(file!=NULL){
 
-    while(1)
-    {
-        fread(&temp,sizeof(temp),1,file);
-        if(feof(file))
+        printf("\n\n\n");
+        displayASCII("./ascii-arts/preview.txt");
+
+        while(1)
         {
-            break;
+            fread(&temp,sizeof(temp),1,file);
+            if(feof(file))
+            {
+                break;
+            }
+        
+            if(i==bookNumber)
+            {
+                printf("%s \n%s",temp.name,temp.preview);
+                printf("\n\n");
+            }
+            i++;
         }
-    
-        if(i==bookNumber)
-        {
-            printf("%s \n%s",temp.name,temp.preview);
-            printf("\n\n");
-        }
-        i++;
+        fclose(file);
     }
-    fclose(file);
 }
 
-void addToIssuedBook(int book_number)
+void addToIssuedBook()
 {
     FILE *readfile,*writefile;
     struct Book temp;
@@ -253,29 +261,42 @@ void addToIssuedBook(int book_number)
     writefile = fopen(fileName, "ab");
     readfile = fopen("./library-data/libraryBook.bin","rb");
 
-    while(1)
-    {
-        fread(&temp,sizeof(temp),1,readfile);
-        if(line==book_number)
+    if(readfile!=NULL){
+
+        printf("The lists of book that you can issue are:-\n");
+
+        printBooks(); 
+
+        int book_number=0;
+        printf("Enter the book number you want to issue: ");
+        scanf("%d",&book_number);
+
+        while(1)
         {
-            fwrite(&temp,sizeof(temp),1,writefile);
-            break;
-        }
-        else
-        {
-            line++;
+            fread(&temp,sizeof(temp),1,readfile);
+            if(line==book_number)
+            {
+                fwrite(&temp,sizeof(temp),1,writefile);
+                break;
+            }
+            else
+            {
+                line++;
+            }
+
+            if(line>book_number)
+            {
+                break;
+            }
         }
 
-        if(line>book_number)
-        {
-            break;
-        }
+        fclose(writefile);
+        fclose(readfile);
+
+        student.nBooks++;
+    }else{
+        printf("library is empty\n");
     }
-
-    fclose(writefile);
-    fclose(readfile);
-
-    student.nBooks++;
 }
 
 void printIssuedBooks(char mail[50])
@@ -289,92 +310,137 @@ void printIssuedBooks(char mail[50])
     struct Book temp;
     int i=1;
 
-    while(1)
-    {
-        fread(&temp,sizeof(temp),1,file);
-        if(feof(file))
+    if(file!=NULL){
+        while(1)
         {
-            if(i==1)
+            fread(&temp,sizeof(temp),1,file);
+            if(feof(file))
             {
-                printf("No books were issued to you\n");
-            }
-            break;
-        }        
-    
-        printf("Book %d:-%s Author:-%s",i,temp.name,temp.author);
-        printf("\n\n");
+                if(i==1)
+                {
+                    printf("No books were issued to you\n");
+                }
+                break;
+            }        
         
-        i++;
+            printf("Book %d:-%s Author:-%s",i,temp.name,temp.author);
+            printf("\n\n");
+            
+            i++;
+        }
+        fclose(file);
+    }else{
+        printf("No books were issued to you\n");
     }
-    fclose(file);
 }
 
 void return_book()
 {
-    int book_number;
-    printf("\nEnter the book number to return:-\n");
-    scanf("%d",&book_number);
 
-    FILE *fp,*fp1;
-    struct Book t,t1;
-    int found=0,count=0,line=1;
-
+    FILE *file1;
     char fileName[50] = "";
-            
+    
     sprintf(fileName, "./book-issue-data/%s.bin", Email);
+    file1 = fopen(fileName, "rb");
+    
+    struct Book temp;
+    int i=1,is_empty=0;
 
-    fp=fopen(fileName,"rb");
-    fp1=fopen("./book-issue-data/temp.bin","wb");
-
-    while(1)
-    {
-        fread(&t,sizeof(t),1,fp);
-
-        if(feof(fp))
+    if(file1!=NULL){
+        while(1)
         {
-            break;
+            fread(&temp,sizeof(temp),1,file1);
+            if(feof(file1))
+            {
+                if(i==1)
+                {
+                    printf("No books were issued to you\n");
+                    is_empty=1;
+                }
+                break;
+            }        
+        
+            printf("Book %d:-%s Author:-%s",i,temp.name,temp.author);
+            printf("\n\n");
+            
+            i++;
         }
-        if(line==book_number)
-        {
-            found=1;
-        }
-        else
-        {
-            fwrite(&t,sizeof(t),1,fp1);
-        }
-
-        line++;
+        fclose(file1);
+    }else{
+        printf("No books were issued to you\n");
+        is_empty=1;
     }
-    fclose(fp);
-    fclose(fp1);
 
-    if(found==0)
-    {
-        printf("Sorry No Record Found\n\n");
-    }
-    else
-    {
-        fp=fopen(fileName,"wb");
-        fp1=fopen("./book-issue-data/temp.bin","rb");
+
+
+    if(!is_empty){
+
+        int book_number;
+        printf("\nEnter the book number to return:-\n");
+        scanf("%d",&book_number);
+
+        FILE *fp,*fp1;
+        struct Book t,t1;
+        int found=0,count=0,line=1;
+
+        char fileName[50] = "";
+                
+        sprintf(fileName, "./book-issue-data/%s.bin", Email);
+
+        fp=fopen(fileName,"rb");
+        fp1=fopen("./book-issue-data/temp.bin","wb");
 
         while(1)
         {
-            fread(&t,sizeof(t),1,fp1);
+            fread(&t,sizeof(t),1,fp);
 
-        if(feof(fp1))
+            if(feof(fp))
+            {
+                break;
+            }
+            if(line==book_number)
+            {
+                found=1;
+            }
+            else
+            {
+                fwrite(&t,sizeof(t),1,fp1);
+            }
+
+            line++;
+        }
+        fclose(fp);
+        fclose(fp1);
+
+        if(found==0)
         {
-            break;
+            printf("Sorry No Record Found\n\n");
         }
-            fwrite(&t,sizeof(t),1,fp);
-        }
+        else
+        {
+            fp=fopen(fileName,"wb");
+            fp1=fopen("./book-issue-data/temp.bin","rb");
 
-        printf("\nBook has been returned sucessefully\n");
+            while(1)
+            {
+                fread(&t,sizeof(t),1,fp1);
+
+            if(feof(fp1))
+            {
+                break;
+            }
+                fwrite(&t,sizeof(t),1,fp);
+            }
+
+            printf("\nBook has been returned sucessefully\n");
+
+        }
+        fclose(fp);
+        fclose(fp1);
+
+        student.nBooks--;
 
     }
-    fclose(fp);
-    fclose(fp1);
-
-    student.nBooks--;
 }
 
 //need to review
