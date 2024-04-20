@@ -1,2 +1,2 @@
 # library-management-system
-CS102 Project IIT Patna
+CS102 Project IIT Patna .
