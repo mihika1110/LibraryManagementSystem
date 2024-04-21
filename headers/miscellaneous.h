@@ -22,7 +22,7 @@ void displayASCII(char fileName[50])
     int ch;
     while ((ch = fgetc(file)) != EOF)
     {
-        putchar(ch);
+        printf("%c",ch);
     }
 
     fclose(file);
@@ -48,13 +48,6 @@ void clear()
     #endif
 }
 
-// char *formatDate(int n)
-// {
-//     char *date = malloc(11 * sizeof(char));
-//     sprintf(date, "%d/%d/%d", (n%100),((n%1000)/100),(n/10000));
-
-//     return date;
-// }
 
 void toLower(char *str)
 {

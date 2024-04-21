@@ -48,12 +48,14 @@ struct Credentials fetchCredentials(char email[50])
         struct Credentials temp;
         strcpy(temp.email,"null");
         return temp;
+    }else{
+
+        fread(&credential, sizeof(struct Credentials), 1, file);
+        fclose(file);
+        return credential;
+
     }
-
-
-    fread(&credential, sizeof(struct Credentials), 1, file);
-    fclose(file);
-    return credential;
+       
 }
 
 void storeData(struct Student student, char email[50])
@@ -151,6 +153,7 @@ struct Student loginUser()
     struct Student student;
     char email[50],pass[50];
     int Encrypted_password[8];
+
     printf("Enter your email: ");
     scanf("%s",email);
 

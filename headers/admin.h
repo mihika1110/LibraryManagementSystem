@@ -7,49 +7,30 @@ void addBook()
 {
     struct Book new_book;
 
+        //geting book data//
     printf("\nname of the book : ");
     scanf("%s",&(new_book.name));
+    new_book.issueDate=20240421;
+    new_book.dueDate=20240521;
     printf("\nname of the authour : ");
     scanf("%s",&(new_book.author));
-    new_book.issueDate=20240411;
-    new_book.dueDate=20240511;
+    
 
     FILE *file;
-    file = fopen("./library-data/libraryBook.bin", "ab");
+    file = fopen("./library-data/libraryBook.bin", "ab"); //opening file
 
-    fwrite(&new_book,sizeof(struct Book),1,file);
-    printf("\nnew book added successfully");
+    fwrite(&new_book,sizeof(struct Book),1,file);//writing data to file
+    printf("\nnew book added successfully\n");
 
-    fclose(file);
+    fclose(file);//closing the file 
 
 }
 
 
-// void sendMail()
-// {
-//     char temp_mail[50],subject[50];
-//     printf("send message to email : ");
-//     scanf("%s",temp_mail);
-//     printf("subject of the mail : ");
-//     scanf("%s",subject);
-
-//     FILE *file;
-//     char fileName[50] ;
-//     sprintf(fileName,"./message/%s.bin",temp_mail);
-//     file=fopen(fileName,"ab");
-//     fwrite(subject,sizeof(subject),1,file);
-
-//     fclose(file);
-
-    
-//     printf("\n\nEmail sent sucessfully\n");
-// }
-
-
 void remove_book(){
 
-    FILE *fp,*fp1;
-    struct Book t,t1;
+    FILE *file,*temp_file;
+    struct Book temp_book;
     int found=0,count=0,line=1;
 
     char fileName[50] = "";
@@ -57,10 +38,10 @@ void remove_book(){
     sprintf(fileName, "./library-data/libraryBook.bin");
             
 
-    fp=fopen(fileName,"rb");
-    fp1=fopen("./book-issue-data/temp.bin","wb");
+    file=fopen(fileName,"rb");  //opening files
+    temp_file=fopen("./book-issue-data/temp.bin","wb");
 
-    if(fp!=NULL){
+    if(file!=NULL){//checking if file is there
 
         int book_number;
             printf("Book number you want to delete: ");
@@ -69,9 +50,9 @@ void remove_book(){
 
         while(1)
         {
-            fread(&t,sizeof(t),1,fp);
+            fread(&temp_book,sizeof(temp_book),1,file);
 
-            if(feof(fp))
+            if(feof(file))//checking for end of the file
             {
                 break;
             }
@@ -81,13 +62,13 @@ void remove_book(){
             }
             else
             {
-                fwrite(&t,sizeof(t),1,fp1);
+                fwrite(&temp_book,sizeof(temp_book),1,temp_file);//writing data to the temp file
             }
 
             line++;
         }
-        fclose(fp);
-        fclose(fp1);
+        fclose(file);
+        fclose(temp_file);
 
         if(found==0)
         {
@@ -95,26 +76,29 @@ void remove_book(){
         }
         else
         {
-            fp=fopen(fileName,"wb");
-            fp1=fopen("./book-issue-data/temp.bin","rb");
+            file=fopen(fileName,"wb");
+            temp_file=fopen("./book-issue-data/temp.bin","rb");
 
-        while(1)
-        {
-            fread(&t,sizeof(t),1,fp1);
+            //rewriting data to original file
 
-        if(feof(fp1))
-        {
-            break;
+            while(1)
+            {
+                fread(&temp_book,sizeof(temp_book),1,temp_file);
+
+                if(feof(temp_file))
+                {
+                    break;
+                }
+
+                fwrite(&temp_book,sizeof(temp_book),1,file);
+            }
         }
-            fwrite(&t,sizeof(t),1,fp);
-        }
-        }
-        fclose(fp);
-        fclose(fp1);
+        fclose(file);//close the file
+        fclose(temp_file);
 
         printf("\n\nBook has been removed successfully from the library.\n");
     }else{
-        printf("no book to remove\n");
+        printf("no books to remove\n");
     }
 }
 
@@ -122,76 +106,85 @@ void remove_book(){
 void print_users()
 {
 
-    DIR *dr;
-   struct dirent *en;
+   DIR *directory; //creating a directory pointer
+   struct dirent *directory_entry;
    int i=1;
-   dr = opendir("./credentials"); //open all or present directory
-   if (dr!=NULL) {
-      while ((en = readdir(dr)) != NULL) {
-        if(!(en->d_type)){
+   directory = opendir("./credentials"); //opening the directory
+   
+   if (directory!=NULL) {
+      while ((directory_entry = readdir(directory)) != NULL) {
+        if(!(directory_entry->d_type)){
+            //printing every entry in the directory
+
             FILE *file;
             struct Credentials user_data;
             char fileName[50];
-            sprintf(fileName,"./credentials/%s",en->d_name);
+            sprintf(fileName,"./credentials/%s",directory_entry->d_name);
             
             file=fopen(fileName,"rb");
-            fread(&user_data,sizeof(user_data),1,file);
 
-
-            printf("%d. %s\n",i, user_data.email); //print all directory name
-            i++;
-            fclose(file);
+            if(file!=NULL){
+                fread(&user_data,sizeof(user_data),1,file);
+                printf("%d. %s\n",i, user_data.email); //print all directory name
+                
+                i++;
+                fclose(file);
+            }
+            
         }
       }
-      closedir(dr); //close all directory
+      closedir(directory); //close all directory
    }
 }
 
 void Modify_book(int book_number){
+
+    FILE *file,*temp_file;
+    struct Book temp_book,modifed_book;
+    int found=0,count=0,line=1;
     char modify_name[50],modify_author[50];
 
+    //input
     printf("Modifed name of the book : ");
         scanf("%s",modify_name);
     printf("Modifed author of the book : ");
         scanf("%s",modify_author);
 
-    FILE *fp,*fp1;
-    struct Book t,t1,temp_book;
-    int found=0,count=0,line=1;
 
-    sprintf(temp_book.name,modify_name);
-    sprintf(temp_book.author,modify_author);
+    sprintf(modifed_book.name,modify_name);
+    sprintf(modifed_book.author,modify_author);
 
     char fileName[50] = "";
             
             sprintf(fileName, "./library-data/libraryBook.bin");
             
 
-    fp=fopen(fileName,"rb");
-    fp1=fopen("./book-issue-data/temp.bin","wb");
+    file=fopen(fileName,"rb");
+    temp_file=fopen("./book-issue-data/temp.bin","wb");
 
+    //transfering data to a temp file
     while(1)
     {
-        fread(&t,sizeof(t),1,fp);
+        fread(&temp_book,sizeof(temp_book),1,file);
 
-        if(feof(fp))
+        if(feof(file))
         {
             break;
         }
         if(line==book_number)
         {
-            fwrite(&temp_book,sizeof(struct Book),1,fp1);
+            fwrite(&modifed_book,sizeof(struct Book),1,temp_file);
             found=1;
         }
         else
         {
-            fwrite(&t,sizeof(t),1,fp1);
+            fwrite(&temp_book,sizeof(temp_book),1,temp_file);
         }
 
         line++;
     }
-    fclose(fp);
-    fclose(fp1);
+    fclose(file);
+    fclose(temp_file);
 
     if(found==0)
     {
@@ -199,61 +192,60 @@ void Modify_book(int book_number){
     }
     else
     {
-        fp=fopen(fileName,"wb");
-        fp1=fopen("./book-issue-data/temp.bin","rb");
+        file=fopen(fileName,"wb");//opening the file
+        temp_file=fopen("./book-issue-data/temp.bin","rb");
 
-    while(1)
-    {
-        fread(&t,sizeof(t),1,fp1);
+        //writing data to the original file
+        while(1)
+        {
+            fread(&temp_book,sizeof(temp_book),1,temp_file);
 
-    if(feof(fp1))
-    {
-        break;
+            if(feof(temp_file))
+            {
+                break;
+            }
+
+            fwrite(&temp_book,sizeof(temp_book),1,file);
+        }
     }
-        fwrite(&t,sizeof(t),1,fp);
-    }
-    }
-    fclose(fp);
-    fclose(fp1);
+    fclose(file);
+    fclose(temp_file);
 }
 
 void delete_user(int user_number){
 
-    DIR *dr;
+    DIR *directory;
    struct dirent *en;
     int line=1;
 
-   dr = opendir("./credentials"); //open all or present directory
+   directory = opendir("./credentials"); //opening the directory
 
-   if (dr!=NULL) {
-      while ((en = readdir(dr)) != NULL) {
+   if (directory!=NULL) {
+      while ((en = readdir(directory)) != NULL) {
         if(!(en->d_type)){
             if(line==user_number){
-                
+                //printing every entry in the directory
+
                 char fileName[50];
                 sprintf(fileName,"./credentials/%s",en->d_name);
                 
                 if(!strcmp(en->d_name,"admin_admin@iitp.ac.in.bin")){
                     printf("can not delete admin\n");
                 }else{
-                    if(remove(fileName)){
+                    if(!remove(fileName)){  //removing the user
                         printf("user deleted successfully\n");
                     }else{
                         printf("%s user not found\n",fileName);
                     }
                 }
-                
 
                 break;
             }
 
             line++;
-
-        
-            
         }
       }
-      closedir(dr); //close all directory
+      closedir(directory); //close all directory
    }
 
 }

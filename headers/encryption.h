@@ -136,7 +136,7 @@ void EncryptPasssword(char input_pass[8],int encrpted_password[8])
            break; 
         }
     }
-    printf("000001%s\n",str);
+    
     int binary_arrays[8][8]; // Arrays to store binary representation of each character
 
 
@@ -465,15 +465,13 @@ for (size_t k = 0; k < strlen(str); k++) {
     afteripinverse[j] = '\0';
 
 
-    printf("--->8-bit Ciphertext will be= ");
     for(i=0; i<=j; i++)
     {
-        printf("%d",afteripinverse[i]);
         encrpted_password[i]=afteripinverse[i];
     }
-printf("\n");
+
 }
 
-printf("done\n");
+
 
 }
