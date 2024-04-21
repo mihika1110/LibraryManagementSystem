@@ -63,6 +63,7 @@ void welcomePage()
 
             char fileName[50];
             sprintf(fileName, "students-data/%s.bin",Email);
+
             student=fetchData(fileName);
             admin=fetchData("students-data/admin_admin@iitp.ac.in.bin");
         }
@@ -179,12 +180,6 @@ void homePage()
             
             return_back();
         }
-        // else if(choice==2)
-        // {            
-        //     sendMail();//sends mails to the library customers
-
-        //     return_back();      
-        // }
         else if(choice==2)
         {
             printBooks();//prints all the lists of books available
